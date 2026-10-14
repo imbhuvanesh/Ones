@@ -1,0 +1,116 @@
+/* ============================================================
+   animations.css
+   Scroll-driven reveals (driven by js/reveal.js).
+
+   Add one of these to any element:
+
+     data-reveal              blur + fade: the block eases out of a soft
+                              blur and lifts slightly (the default look)
+     data-reveal="blur"       same as the default
+     data-reveal="fade"       plain fade, no blur
+
+     data-reveal-group        auto-stagger the direct [data-reveal] children
+     data-reveal-delay="200"  extra ms on top of the auto stagger
+
+   Usage: put data-reveal on a section's inner wrapper and the whole
+   block sharpens into view as it scrolls in.
+
+   Every rule is gated behind the `.js` class added in <head>, so the page
+   still renders normally when JavaScript is unavailable.
+   ============================================================ */
+
+/* ---------- Shared starting state ---------- */
+.js [data-reveal] {
+  --reveal-d:     0ms;
+  --reveal-dur:   1000ms;
+  --reveal-blur:  14px;
+  --reveal-shift: 1.1rem;
+
+  opacity: 0;
+  filter: blur(var(--reveal-blur));
+  transform: translateY(var(--reveal-shift));
+  will-change: opacity, filter, transform;
+}
+
+/* ---------- Revealed state ----------
+   The transition is declared HERE and not on the base state: transitions are
+   started from the after-change style, so removing .reveal-in (when a block
+   scrolls back out of view and re-arms itself) snaps to the hidden state
+   instantly instead of playing the reveal backwards. */
+.js [data-reveal].reveal-in {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  transition:
+    opacity var(--reveal-dur) var(--ease) var(--reveal-d),
+    filter var(--reveal-dur) var(--ease) var(--reveal-d),
+    transform var(--reveal-dur) var(--ease) var(--reveal-d);
+}
+
+/* Added once the reveal has finished: drop the filter entirely — a lingering
+   filter would create a containing block for any fixed children — and
+   release the GPU layers. */
+.js [data-reveal].reveal-done {
+  filter: none;
+  will-change: auto;
+  transition: none;
+}
+
+/* ============================================================
+   Variants
+   ============================================================ */
+
+/* Blur + fade is the default: an element with no value, or ="blur". */
+
+.js [data-reveal='fade'] {
+  --reveal-blur:  0px;
+  --reveal-shift: 0rem;
+}
+
+/* ============================================================
+   Reduced motion: show everything immediately, no blur.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+  .js [data-reveal].reveal-in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
+/* ---------- Hero title: per-letter mask lift (kept for reference) ---------- */
+.split { display: inline-block; }
+
+.split .char-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders (the "y") inside the clipping box */
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.split .char {
+  display: inline-block;
+  /* No transform in the resting state: if the animation is unavailable or
+     disabled, the letter simply shows. The offset lives in the keyframe. */
+  animation: charUp 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 55ms + 250ms);
+  will-change: transform;
+}
+
+.split .char--space { width: 0.3em; }
+
+@keyframes charUp {
+  from { transform: translateY(115%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split .char {
+    transform: none;
+    animation: none;
+  }
+}

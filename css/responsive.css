@@ -1,0 +1,39 @@
+/* ============================================================
+   responsive.css
+   Small-screen and large-screen tweaks. Loaded last so it wins.
+   ============================================================ */
+
+/* ---------- Stack the About section ---------- */
+@media (max-width: 860px) {
+  .about { padding-block: 8vh; }
+
+  .about__inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .about__media {
+    width: min(100%, 320px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 520px) {
+  /* keep the hero name comfortably inside the viewport on small phones */
+  .heading-xl {
+    font-size: clamp(2.5rem, 18vw, 5rem);
+    line-height: 1.05;
+  }
+
+  .about__photo img { aspect-ratio: 1 / 1; }
+}
+
+@media (min-width: 1400px) {
+  :root { --maxw: 1280px; }
+}
+
+/* No cursor to trail on touch devices — drop the images and the extra work. */
+@media (hover: none), (pointer: coarse) {
+  .Hero { padding-block: 6vh; }
+  .Hero__images { display: none; }
+}

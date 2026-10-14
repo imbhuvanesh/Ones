@@ -1,0 +1,189 @@
+/* ============================================================
+   base.css
+   Fonts, design tokens, reset and typography.
+   Edit the tokens in :root to re-skin the whole site.
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: 'Zither';
+  src: url('../fonts/OPTIZither.otf') format('opentype'),
+       url('../fonts/OPTIZither.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* palette */
+  --bg:          #07080c;
+  --ink:         #f5f5f7;
+  --ink-soft:    rgba(245, 245, 247, 0.68);
+  --ink-faint:   rgba(245, 245, 247, 0.40);
+  --accent:      #d8b877;
+  --accent-2:    #8fb0ff;
+  --line:        rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --glass:       rgba(255, 255, 255, 0.055);
+  --glass-strong:rgba(255, 255, 255, 0.10);
+
+  /* shape */
+  --radius:      26px;
+  --radius-sm:   14px;
+  --radius-pill: 999px;
+
+  /* type */
+  --font-display: 'Zither', 'Times New Roman', Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --font-google: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 Roboto, Helvetica, Arial, sans-serif;
+  --font-open:   'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 Roboto, Helvetica, Arial, sans-serif;
+
+  --fs-hero: clamp(3.6rem, 17vw, 15rem);
+  --fs-h2:   clamp(2rem, 5.5vw, 3.75rem);
+  --fs-h3:   clamp(1.05rem, 2vw, 1.35rem);
+
+  /* layout */
+  --maxw:   1180px;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* motion */
+  --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+ul, ol { list-style: none; }
+
+::selection {
+  background: var(--accent);
+  color: #10100c;
+}
+
+/* thin, dark scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 3px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.24); }
+
+/* ---------- Typography ---------- */
+h1, h2, h3 {
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.heading-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 13vw, 13rem);
+  font-weight: 400;            /* Zither ships a single weight */
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  /* keeps the name readable over any background image */
+  text-shadow: 0 10px 60px rgba(0, 0, 0, 0.55);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: 1;
+}
+
+h3 { font-size: var(--fs-h3); letter-spacing: 0; line-height: 1.3; }
+
+p { max-width: 62ch; }
+
+.muted { color: var(--ink-soft); }
+.faint { color: var(--ink-faint); }
+
+/* ---------- Web-font utility classes ----------
+   Google Fonts' own snippets, wired to our tokens. Drop either class on
+   any element to switch just that element's typeface. */
+.font-google {
+  font-family: var(--font-google);
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "GRAD" 0;
+}
+
+.font-open {
+  font-family: var(--font-open);
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+/* focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- Accessibility ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
