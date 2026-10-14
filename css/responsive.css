@@ -1,14 +1,20 @@
 /* ============================================================
    responsive.css
    Small-screen and large-screen tweaks. Loaded last so it wins.
+
+   Most of the responsiveness is handled by the fluid primitives in
+   base.css / layout.css: every content wrapper resolves to the single
+   --maxw width, and grids use `auto-fit` + `minmax` with `clamp()` gaps and
+   `clamp()` type, so they re-flow on their own. This file only holds the
+   places where a layout genuinely has to change shape.
    ============================================================ */
 
-/* ---------- Stack the About section ---------- */
+/* ---------- About: two columns -> one stack ----------
+   Below ~860px the portrait and the text get too tight side by side, so the
+   block stacks and the photo is centred under/above the copy. */
 @media (max-width: 860px) {
-  .about { padding-block: 8vh; }
-
   .about__inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
 
@@ -19,21 +25,12 @@
 }
 
 @media (max-width: 520px) {
-  /* keep the hero name comfortably inside the viewport on small phones */
-  .heading-xl {
-    font-size: clamp(2.5rem, 18vw, 5rem);
-    line-height: 1.05;
-  }
-
+  /* a square portrait saves vertical space on a small phone */
   .about__photo img { aspect-ratio: 1 / 1; }
-}
-
-@media (min-width: 1400px) {
-  :root { --maxw: 1280px; }
 }
 
 /* No cursor to trail on touch devices — drop the images and the extra work. */
 @media (hover: none), (pointer: coarse) {
-  .Hero { padding-block: 6vh; }
+  .Hero { padding-block: clamp(2rem, 6vh, 4.5rem); }
   .Hero__images { display: none; }
 }

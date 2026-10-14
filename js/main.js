@@ -25,6 +25,18 @@
 
     /* Decorative extras — a failure here must never hide content. */
     if (typeof P.initMascots === 'function') P.initMascots();
+
+    /* Greeting preloader: fades itself out once the page is ready. Started
+       last so the reveal engine is already observing behind it, and wrapped
+       so a failure can never leave the overlay covering the site. */
+    try {
+      if (typeof P.initPreloader !== 'function') throw new Error('preloader.js missing');
+      P.initPreloader();
+    } catch (err) {
+      document.documentElement.classList.remove('is-loading');
+      var veil = document.getElementById('preloader');
+      if (veil && veil.parentNode) veil.parentNode.removeChild(veil);
+    }
   }
 
   if (document.readyState === 'loading') {

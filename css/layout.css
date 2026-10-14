@@ -41,8 +41,11 @@
 }
 
 /* ---------- Container ---------- */
+/* The parent already pads with --gutter, so this only caps the content
+   width. (It used to subtract the gutter a second time, which gave the hero
+   a double inset — 40px where every section got 20px.) */
 .container {
-  width: min(100% - (var(--gutter) * 2), var(--maxw));
+  width: min(100%, var(--maxw));
   margin-inline: auto;
 }
 
@@ -53,7 +56,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100svh;
-  padding: 8vh var(--gutter);
+  padding: clamp(2.5rem, 8vh, 6rem) var(--gutter);
 }
 
 /* The name sits above the image trail: the flowers are position: fixed and
@@ -89,11 +92,11 @@
   position: relative;
   display: grid;
   place-items: center;
-  padding: 7vh var(--gutter);
+  padding: var(--section-y) var(--gutter);
 }
 
 .about__inner {
-  width: min(100%, 1040px);
+  width: min(100%, var(--maxw));
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: clamp(1.75rem, 5vw, 4rem);
@@ -170,11 +173,11 @@
 /* ---------- Technical skills ---------- */
 .skills {
   position: relative;
-  padding: 7vh var(--gutter);
+  padding: var(--section-y) var(--gutter);
 }
 
 .skills__inner {
-  width: min(100%, 1100px);
+  width: min(100%, var(--maxw));
   margin-inline: auto;
 }
 
@@ -227,8 +230,8 @@
 .skill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.75rem 0.4rem 0.55rem;
+  gap: 0.55rem;
+  padding: 0.45rem 0.8rem 0.45rem 0.6rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.045);
@@ -245,8 +248,8 @@
 }
 
 .skill__icon {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   flex: none;
   object-fit: contain;
 }
@@ -264,7 +267,7 @@
   );
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
@@ -282,11 +285,11 @@
 /* ---------- Projects ---------- */
 .projects {
   position: relative;
-  padding: 7vh var(--gutter);
+  padding: var(--section-y) var(--gutter);
 }
 
 .projects__inner {
-  width: min(100%, 1100px);
+  width: min(100%, var(--maxw));
   margin-inline: auto;
 }
 
@@ -296,10 +299,19 @@
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
 
-.project {
+/* Each cell stretches so the card/button inside fills the whole row height. */
+.projects__list > li {
   display: flex;
+}
+
+.project {
+  /* The whole card is the button — clicking anywhere on it opens the repo. */
+  display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.85rem;
+  color: inherit;
+  text-decoration: none;
   padding: clamp(1.25rem, 3vw, 1.75rem);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -323,17 +335,19 @@
   box-shadow: 0 34px 80px rgba(0, 0, 0, 0.5);
 }
 
+/* Keyboard users get the same lift + a visible ring. */
+.project:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  transform: translateY(-5px);
+  border-color: var(--line-strong);
+  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.5);
+}
+
 .project__head {
   display: flex;
   align-items: baseline;
   gap: 0.7rem;
-}
-
-.project__num {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  color: var(--accent);
 }
 
 .project__title {
@@ -343,45 +357,32 @@
   line-height: 1.3;
   letter-spacing: 0;
   color: var(--ink);
+  transition: color 320ms var(--ease);
 }
 
-/* The heading name is the button: clicking it opens the repository. */
-.project__title-link {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  color: inherit;
-  text-decoration: none;
-  background-image: linear-gradient(currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 1px;
+/* The name sits on the button; hovering the card lights it up. */
+.project:hover .project__title,
+.project:focus-visible .project__title {
+  color: var(--accent);
+}
+
+/* Corner arrow: the "this whole card is a link" cue. */
+.project__go {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-left: auto;
+  align-self: center;
+  color: var(--ink-faint);
   transition:
     color 320ms var(--ease),
-    background-size 320ms var(--ease);
-}
-
-.project__title-link:hover,
-.project__title-link:focus-visible {
-  color: var(--accent);
-  background-size: 100% 1px;
-}
-
-.project__title-arrow {
-  width: 0.72em;
-  height: 0.72em;
-  flex: none;
-  opacity: 0;
-  transform: translate(-0.15rem, 0.15rem);
-  transition:
-    opacity 320ms var(--ease),
     transform 320ms var(--ease);
 }
 
-.project__title-link:hover .project__title-arrow,
-.project__title-link:focus-visible .project__title-arrow {
-  opacity: 1;
-  transform: translate(0, 0);
+.project:hover .project__go,
+.project:focus-visible .project__go {
+  color: var(--accent);
+  transform: translate(3px, -3px);
 }
 
 .project__desc {
@@ -467,12 +468,12 @@
 .experience,
 .education {
   position: relative;
-  padding: 7vh var(--gutter);
+  padding: var(--section-y) var(--gutter);
 }
 
 .experience__inner,
 .education__inner {
-  width: min(100%, 1100px);
+  width: min(100%, var(--maxw));
   margin-inline: auto;
 }
 
@@ -630,11 +631,11 @@
 /* ---------- Contact ---------- */
 .contact {
   position: relative;
-  padding: 7vh var(--gutter) 9vh;
+  padding: var(--section-y) var(--gutter) var(--section-y-end);
 }
 
 .contact__inner {
-  width: min(100%, 1100px);
+  width: min(100%, var(--maxw));
   margin-inline: auto;
   display: flex;
   flex-direction: column;

@@ -13,47 +13,84 @@
      data-reveal-delay="200"  extra ms on top of the auto stagger
 
    Usage: put data-reveal on a section's inner wrapper and the whole
-   block sharpens into view as it scrolls in.
+   block sharpens into view as it scrolls in, then eases smoothly back out
+   (blur + fade + drift) as it scrolls away. The direct children of the block
+   stagger in behind it.
 
    Every rule is gated behind the `.js` class added in <head>, so the page
    still renders normally when JavaScript is unavailable.
    ============================================================ */
 
-/* ---------- Shared starting state ---------- */
+/* ---------- Hidden state ----------
+   Every block lives in two states: hidden (this rule) and revealed
+   (.reveal-in). The transition is declared on BOTH, so the block eases in as
+   it arrives and eases back out as it leaves — the hide plays as an animation
+   instead of snapping. (Transitions are started from the after-change style,
+   so removing .reveal-in animates because the base rule carries a transition
+   too.) The exit is a touch quicker than the entrance. */
 .js [data-reveal] {
-  --reveal-d:     0ms;
-  --reveal-dur:   1000ms;
-  --reveal-blur:  14px;
-  --reveal-shift: 1.1rem;
+  --reveal-d:       0ms;
+  --reveal-in-dur:  950ms;
+  --reveal-out-dur: 720ms;
+  --reveal-blur:    14px;
+  --reveal-shift:   1.1rem;
+  --reveal-scale:   0.988;
 
   opacity: 0;
   filter: blur(var(--reveal-blur));
-  transform: translateY(var(--reveal-shift));
+  transform: translateY(var(--reveal-shift)) scale(var(--reveal-scale));
+
+  transition:
+    opacity var(--reveal-out-dur) var(--ease-soft) var(--reveal-d),
+    filter var(--reveal-out-dur) var(--ease-soft) var(--reveal-d),
+    transform var(--reveal-out-dur) var(--ease-soft) var(--reveal-d);
+
   will-change: opacity, filter, transform;
 }
 
-/* ---------- Revealed state ----------
-   The transition is declared HERE and not on the base state: transitions are
-   started from the after-change style, so removing .reveal-in (when a block
-   scrolls back out of view and re-arms itself) snaps to the hidden state
-   instantly instead of playing the reveal backwards. */
+/* ---------- Revealed state ---------- */
 .js [data-reveal].reveal-in {
   opacity: 1;
   filter: blur(0);
   transform: none;
   transition:
-    opacity var(--reveal-dur) var(--ease) var(--reveal-d),
-    filter var(--reveal-dur) var(--ease) var(--reveal-d),
-    transform var(--reveal-dur) var(--ease) var(--reveal-d);
+    opacity var(--reveal-in-dur) var(--ease) var(--reveal-d),
+    filter var(--reveal-in-dur) var(--ease) var(--reveal-d),
+    transform var(--reveal-in-dur) var(--ease) var(--reveal-d);
 }
 
-/* Added once the reveal has finished: drop the filter entirely — a lingering
-   filter would create a containing block for any fixed children — and
-   release the GPU layers. */
+/* Added once the entrance has finished: drop the filter entirely — a lingering
+   filter would create a containing block for any fixed children — and release
+   the GPU layers. It is removed together with .reveal-in on exit, so the base
+   transition above takes over again for the hide. */
 .js [data-reveal].reveal-done {
   filter: none;
   will-change: auto;
   transition: none;
+}
+
+/* ---------- Inner stagger ----------
+   The direct children of a revealed block drift in one after another, so a
+   section assembles itself instead of popping in as one flat plate. Delays
+   stay short and travel stays small to keep the motion calm. */
+.js [data-reveal] > * {
+  --kid-d: 0ms;
+
+  opacity: 0;
+  transform: translateY(0.6rem);
+  transition:
+    opacity 600ms var(--ease-soft) var(--kid-d),
+    transform 760ms var(--ease) var(--kid-d);
+}
+
+.js [data-reveal] > *:nth-child(2)          { --kid-d: 70ms; }
+.js [data-reveal] > *:nth-child(3)          { --kid-d: 140ms; }
+.js [data-reveal] > *:nth-child(4)          { --kid-d: 210ms; }
+.js [data-reveal] > *:nth-child(n + 5)      { --kid-d: 260ms; }
+
+.js [data-reveal].reveal-in > * {
+  opacity: 1;
+  transform: none;
 }
 
 /* ============================================================
@@ -65,6 +102,7 @@
 .js [data-reveal='fade'] {
   --reveal-blur:  0px;
   --reveal-shift: 0rem;
+  --reveal-scale: 1;
 }
 
 /* ============================================================
@@ -72,7 +110,9 @@
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal],
-  .js [data-reveal].reveal-in {
+  .js [data-reveal].reveal-in,
+  .js [data-reveal] > *,
+  .js [data-reveal].reveal-in > * {
     opacity: 1;
     transform: none;
     filter: none;

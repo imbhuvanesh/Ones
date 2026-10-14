@@ -8,8 +8,35 @@
   <title>Shereya</title>
 
   <!-- Marks the document as "JS-capable" so the reveal styles only apply
-       when JS can actually drive them. Runs before the stylesheets. -->
-  <script>document.documentElement.classList.add('js');</script>
+       when JS can actually drive them, and raises the preloader curtain.
+       Runs before the stylesheets so the greeting overlay is already on
+       screen at the first paint — no flash of the bare page. -->
+  <script>
+    (function (d, w) {
+      var root = d.documentElement;
+      root.classList.add('js');
+
+      /* The greeting intro is pure decoration: skip it for reduced motion. */
+      if (w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      root.classList.add('is-loading');
+
+      /* Stamp the instant the overlay becomes visible so its 3s timeline is
+         measured from the first paint, not from whenever the scripts get
+         around to running. */
+      w.__preloaderT0 = w.performance && w.performance.now
+        ? w.performance.now()
+        : Date.now();
+
+      /* Failsafe: if anything stalls, never keep the visitor behind the
+         overlay for more than a few seconds. */
+      w.setTimeout(function () {
+        var el = d.getElementById('preloader');
+        root.classList.remove('is-loading');
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      }, 8000);
+    })(document, window);
+  </script>
 
   <!-- Web fonts: Google Sans for labels/titles, Open Sans for small text.
        Served from Google Fonts, so they need an internet connection
@@ -23,9 +50,20 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/preloader.css">
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
+
+  <!-- Greeting preloader. The inline <head> script adds .is-loading, which
+       shows this overlay; js/preloader.js cycles the word and takes the
+       overlay away again once the page is ready. Decorative, so it is
+       hidden from assistive tech. -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__stage">
+      <span class="preloader__word" data-preloader-word>Hello</span>
+    </div>
+  </div>
 
   <!-- Fixed background -->
   <div class="site-bg" aria-hidden="true">
@@ -124,15 +162,15 @@
             <h3 class="skill-card__title">Programming</h3>
             <ul class="skill-card__list">
               <li class="skill">
-                <img class="skill__icon" src="images/skills/python.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/python.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Python</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/java.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/java.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Java</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/mysql.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/mysql.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">SQL</span>
               </li>
             </ul>
@@ -142,15 +180,15 @@
             <h3 class="skill-card__title">Web development</h3>
             <ul class="skill-card__list">
               <li class="skill">
-                <img class="skill__icon" src="images/skills/react.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/react.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">ReactJS</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/html.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/html.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">HTML</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/css.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/css.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">CSS</span>
               </li>
             </ul>
@@ -160,19 +198,19 @@
             <h3 class="skill-card__title">AI / ML</h3>
             <ul class="skill-card__list">
               <li class="skill">
-                <img class="skill__icon" src="images/skills/tensorflow.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/tensorflow.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">CNN</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/scikitlearn.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/scikitlearn.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">K-Means</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/scikitlearn.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/scikitlearn.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Random Forest</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/pytorch.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/pytorch.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Machine learning</span>
               </li>
             </ul>
@@ -190,7 +228,7 @@
                 <span class="skill__name">OpenAI API</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/flask.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/flask.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Flask</span>
               </li>
             </ul>
@@ -200,7 +238,7 @@
             <h3 class="skill-card__title">Databases</h3>
             <ul class="skill-card__list">
               <li class="skill">
-                <img class="skill__icon" src="images/skills/mysql.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/mysql.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">MySQL</span>
               </li>
             </ul>
@@ -210,15 +248,15 @@
             <h3 class="skill-card__title">Tools</h3>
             <ul class="skill-card__list">
               <li class="skill">
-                <img class="skill__icon" src="images/skills/git.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/git.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Git</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/github.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/github.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">GitHub</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/vscode.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/vscode.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">VS Code</span>
               </li>
               <li class="skill">
@@ -226,7 +264,7 @@
                 <span class="skill__name">Jupyter</span>
               </li>
               <li class="skill">
-                <img class="skill__icon" src="images/skills/notion.svg" alt="" width="22" height="22" loading="lazy">
+                <img class="skill__icon" src="images/skills/notion.svg" alt="" width="30" height="30" loading="lazy">
                 <span class="skill__name">Notion</span>
               </li>
               <li class="skill">
@@ -271,141 +309,67 @@
 
         <ol class="projects__list">
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">01</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05/Carrentalsystem" target="_blank" rel="noopener noreferrer">Car Rental System<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              A web application that simplifies car rentals with
-              secure authentication,
-              vehicle availability and
-              online booking, plus booking history and
-              administrative management.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>React</li><li>Tailwind CSS</li><li>Node.js</li><li>Express.js</li><li>MongoDB</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05/Carrentalsystem" target="_blank" rel="noopener noreferrer" aria-label="Car Rental System — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">Car Rental System</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">02</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05/hostel-complaint-tracker" target="_blank" rel="noopener noreferrer">Hostel Complaint Tracker<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              A complaint management system that helps students
-              submit complaints and enables administrators to
-              track, manage and
-              resolve issues efficiently.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>HTML</li><li>CSS</li><li>PHP</li><li>MySQL</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05/hostel-complaint-tracker" target="_blank" rel="noopener noreferrer" aria-label="Hostel Complaint Tracker — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">Hostel Complaint Tracker</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">03</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05/IPL_Score_Prediction" target="_blank" rel="noopener noreferrer">IPL Score Prediction<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              A machine learning project that analyses cricket data to
-              predict IPL match scores and explore
-              data-driven insights.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Focus</span>
-              <ul class="project__tags">
-                <li>Machine Learning</li><li>Data Analysis</li><li>Predictive Modelling</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05/IPL_Score_Prediction" target="_blank" rel="noopener noreferrer" aria-label="IPL Score Prediction — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">IPL Score Prediction</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">04</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05/QR_code_generator_resume" target="_blank" rel="noopener noreferrer">QR Code Generator for Resumes<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              A Python-based application that generates
-              QR codes for resumes, making it easier to
-              share professional profiles and resume links.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>Python</li><li>QR Code Generation</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05/QR_code_generator_resume" target="_blank" rel="noopener noreferrer" aria-label="QR Code Generator for Resumes — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">QR Code Generator for Resumes</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">05</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer">Deepfake Detection System<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              An AI-powered system that uses
-              Convolutional Neural Networks (CNNs) to identify
-              manipulated media, with a reported accuracy of
-              96%, and provides a web interface through
-              Flask.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>Python</li><li>CNN</li><li>Deep Learning</li><li>Flask</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer" aria-label="Deepfake Detection System — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">Deepfake Detection System</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">06</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer">RAG Chatbot<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              An intelligent chatbot that retrieves relevant information from a
-              knowledge source and generates
-              contextual responses using
-              Retrieval-Augmented Generation (RAG).
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>Python</li><li>LangChain</li><li>OpenAI API</li><li>RAG</li>
-              </ul>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer" aria-label="RAG Chatbot — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">RAG Chatbot</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
-          <li class="project">
-            <div class="project__head">
-              <span class="project__num">07</span>
-              <h3 class="project__title"><a class="project__title-link" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer">User Behaviour Analysis<svg class="project__title-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-            </div>
-            <p class="project__desc">
-              A data analytics project that identifies user behaviour patterns using
-              K-Means clustering and
-              Random Forest to support
-              data-driven insights.
-            </p>
-            <div class="project__meta">
-              <span class="project__label">Technologies</span>
-              <ul class="project__tags">
-                <li>Python</li><li>K-Means Clustering</li><li>Random Forest</li><li>Data Analysis</li>
-              </ul>
-            </div>
-            <div class="project__meta">
-              <span class="project__label">Project Timeline</span>
-              <span class="project__value">7 days</span>
-            </div>
+          <li>
+            <a class="project" href="https://github.com/Shereya05?tab=repositories" target="_blank" rel="noopener noreferrer" aria-label="User Behaviour Analysis — open the GitHub repository">
+              <div class="project__head">
+                <h3 class="project__title">User Behaviour Analysis</h3>
+                <svg class="project__go" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </a>
           </li>
 
         </ol>
@@ -543,6 +507,10 @@
 
   <!-- Contact mascot: two 3x3 sprite sheets in mascots/ (js/mascot.js) -->
   <script src="js/mascot.js" defer></script>
+
+  <!-- Greeting preloader (js/preloader.js) — must load before main.js,
+       which starts it. -->
+  <script src="js/preloader.js" defer></script>
 
   <script src="js/main.js" defer></script>
 

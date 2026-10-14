@@ -43,13 +43,23 @@
   --font-open:   'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
                  Roboto, Helvetica, Arial, sans-serif;
 
-  --fs-hero: clamp(3.6rem, 17vw, 15rem);
+  /* One monotonic ramp for the hero name. The old styling had a separate
+     <=520px override, so the name jumped DOWN as the screen grew past 520px
+     (80px -> 67.7px) and then grew again. A single clamp is smooth. */
+  --fs-hero: clamp(3.5rem, 16vw, 13rem);
   --fs-h2:   clamp(2rem, 5.5vw, 3.75rem);
   --fs-h3:   clamp(1.05rem, 2vw, 1.35rem);
 
   /* layout */
-  --maxw:   1180px;
+  /* ONE content width for the whole page. The hero's .container, the About
+     block and every section wrapper all resolve to this, so all content
+     shares the same left and right edge on every screen. */
+  --maxw:   1100px;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  /* Vertical breathing room. The rem floor stops a short viewport (a phone
+     held sideways) from squeezing the sections flat. */
+  --section-y:     clamp(2.5rem, 7vh, 5.5rem);
+  --section-y-end: clamp(3rem, 9vh, 7rem);
 
   /* motion */
   --ease:      cubic-bezier(0.22, 1, 0.36, 1);
@@ -121,7 +131,7 @@ h1, h2, h3 {
 
 .heading-xl {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 13vw, 13rem);
+  font-size: var(--fs-hero);
   font-weight: 400;            /* Zither ships a single weight */
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -138,6 +148,11 @@ h1, h2, h3 {
 h3 { font-size: var(--fs-h3); letter-spacing: 0; line-height: 1.3; }
 
 p { max-width: 62ch; }
+
+/* Safety net: a long unbreakable string (an email, a URL, a long word in a
+   heading) must never punch out of the layout on a narrow screen. Elements
+   that opt into `white-space: nowrap` are unaffected. */
+h1, h2, h3, p, li, a { overflow-wrap: break-word; }
 
 .muted { color: var(--ink-soft); }
 .faint { color: var(--ink-faint); }

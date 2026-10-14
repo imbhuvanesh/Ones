@@ -1,0 +1,94 @@
+/* ============================================================
+   preloader.css
+   Full-screen greeting preloader (driven by js/preloader.js).
+
+   The word "Hello" sits dead centre over images/pre.jpg, scrambles through
+   greetings in other languages, and then the whole overlay fades away to
+   reveal the page.
+
+   The overlay is gated behind `html.is-loading`, which is only added by
+   the inline <head> script when JS is running AND the visitor has not
+   asked for reduced motion. Without that class the whole thing is
+   display:none, so a JS-less or reduced-motion page simply never sees it.
+   ============================================================ */
+
+.preloader { display: none; }
+
+.is-loading .preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;                 /* above every page layer (page tops out at 2) */
+  display: grid;
+  place-items: center;
+  /* images/pre.jpg fills the screen. The flat --bg sits underneath, so it
+     covers the moment before the photo decodes and remains the fallback if
+     the file is ever missing. */
+  background: var(--bg) url('../images/pre.jpg') center / cover no-repeat;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 700ms var(--ease-soft);   /* keep in sync with FADE in js */
+  will-change: opacity;
+}
+
+/* Soft vignette: settles the photo's edges and ties the overlay into the
+   dark page behind it, whatever slice of the image `cover` lands on at a
+   given viewport ratio. (The centre stays clear, so the photo is untouched
+   where the word sits.) */
+.is-loading .preloader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(7, 8, 12, 0) 34%,
+    rgba(7, 8, 12, 0.62) 100%
+  );
+  pointer-events: none;
+}
+
+/* ---------- The word ---------- */
+.preloader__stage {
+  position: relative;
+  text-align: center;
+}
+
+.preloader__word {
+  display: inline-block;
+  color: var(--ink);
+  font-family: var(--font-google);
+  font-size: clamp(2.4rem, 9.5vw, 6.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+  /* Keep the shuffled graphemes in logical order even when a frame mixes
+     scripts (e.g. Latin + Arabic), so the scramble never reorders itself. */
+  direction: ltr;
+  unicode-bidi: isolate;
+
+  opacity: 0;
+  transform: translateY(0.32em);
+  transition:
+    opacity   520ms var(--ease-soft),
+    transform 660ms var(--ease);
+}
+
+.is-loading .preloader--in .preloader__word {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Exit ---------- */
+.is-loading .preloader--out {
+  opacity: 0;
+}
+
+/* The overlay owns the scroll lock: the page cannot move until it is gone. */
+.is-loading,
+.is-loading body {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader__word { transition: none; }
+}
